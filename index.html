@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Untitled</title>
+  
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo dos Primos</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background: linear-gradient(to right, #6a0dad, #ff69b4);
+            color: white;
+            padding: 20px;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 60%;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #333;
+            padding: 15px;
+            text-align: center;
+            color: black;
+            font-weight: bold;
+        }
+        .highlight {
+            background-color: yellow;
+        }
+        .timer {
+            font-size: 24px;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            display: inline-block;
+            border-radius: 8px;
+        }
+        button {
+            background: #ff69b4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #d14791;
+        }
+        input {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            text-align: center;
+            font-size: 18px;
+        }
+        .article {
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            color: black;
+            font-size: 20px;
+            font-family: 'Times New Roman', serif;
+            text-align: justify;
+            border-radius: 10px;
+            width: 60%;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>🎲 Jogo: Adivinhe o Número Primo! 🎲</h1>
+    <p>⏳ Você tem <span class="timer" id="timeLeft">10</span> segundos e 3 tentativas para acertar!</p>
+    
+    <form id="playerForm">
+        <label for="name">Nome do Participante:</label>
+        <input type="text" id="name" required>
+        <button type="submit">Iniciar</button>
+    </form>
+    
+    <p id="hint"></p>
+    <input type="number" id="guess" min="0" max="100" disabled>
+    <button onclick="checkGuess()" disabled>Chutar</button>
+    <p id="result"></p>
+    
+    <h2>🏆 Ranking 🏆</h2>
+    <ol id="ranking"></ol>
+    
+    <table>
+        <tr id="primesRow"></tr>
+    </table>
+    
+    <script>
+        let primesRow = document.getElementById("primesRow");
+        let primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
+        let secretNumber;
+        let attempts = 3;
+        let timeLeft = 10;
+        let timer;
+        
+        primes.forEach(num => {
+            let cell = document.createElement("td");
+            cell.textContent = num;
+            primesRow.appendChild(cell);
+        });
+        
+        document.getElementById("playerForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            secretNumber = primes[Math.floor(Math.random() * primes.length)];
+            document.getElementById("hint").textContent = `Dica: A raiz quadrada aproximada é ${Math.sqrt(secretNumber).toFixed(2)}`;
+            document.getElementById("guess").disabled = false;
+            document.querySelector("button[onclick='checkGuess()']").disabled = false;
+            document.getElementById("playerForm").style.display = "none";
+            startTimer();
+        });
+        
+        function startTimer() {
+            timer = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    document.getElementById("timeLeft").textContent = timeLeft;
+                } else {
+                    clearInterval(timer);
+                    document.getElementById("result").textContent = "⏳ Tempo esgotado! O número era " + secretNumber;
+                    document.getElementById("guess").disabled = true;
+                    document.querySelector("button[onclick='checkGuess()']").disabled = true;
+                }
+            }, 1000);
+        }
+        
+        function checkGuess() {
+            let guess = parseInt(document.getElementById("guess").value);
+            if (guess === secretNumber) {
+                document.getElementById("result").textContent = "🎉 Parabéns! Você acertou! 🎉";
+                clearInterval(timer);
+            } else {
+                attempts--;
+                if (attempts > 0) {
+                    document.getElementById("result").textContent = `❌ Errou! Você tem ${attempts} tentativas restantes.`;
+                } else {
+                    document.getElementById("result").textContent = "😢 Fim de jogo! O número era " + secretNumber;
+                    clearInterval(timer);
+                    document.getElementById("guess").disabled = true;
+                    document.querySelector("button[onclick='checkGuess()']").disabled = true;
+                }
+            }
+        }
+    </script>
+    
+    <div class="article">
+        <p><strong>No lançamento de um dado,</strong> a probabilidade de sair um número par é calculada dividindo o número de resultados favoráveis pelo número de resultados possíveis.</p>
+        <p><strong>Se lançarmos um dado perfeito,</strong> a probabilidade de sair um número menor que 3 é a mesma para todas as 6 faces.</p>
+        <p><strong>Se a pessoa que escolhe os números</strong> não sabe o número correto e cada número de 1 a 100 tem a mesma probabilidade de ser o número correto, então a probabilidade de escolher o número certo é 1/100.</p>
+        <p><strong>Probabilidade condicional:</strong> A probabilidade condicional é usada quando queremos calcular a chance de um determinado evento A acontecer, sabendo que o evento B já aconteceu.</p>
+    </div>
+</body>
+</html>
+<!-- partial -->
+  
+</body>
+</html>
